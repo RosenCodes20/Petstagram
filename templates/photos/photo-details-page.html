@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+    
+    <div class="container">
+        <div class="col-9">
+            {% include 'common/pets_info.html' with photo_page=True %}
+        </div>
+    </div>
+
+
+{% endblock %}
