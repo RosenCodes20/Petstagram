@@ -1,12 +1,24 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from petstagram.common.models import Like
+from petstagram.photos.forms import PhotoCreateForm, PhotoEditForm
 from petstagram.photos.models import Photo
 
 
 def add_page(request):
 
-    return render(request, "photos/photo-add-page.html")
+    form = PhotoCreateForm(request.POST or None, request.FILES or None)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            return redirect("home-page")
+
+    context = {
+        "form": form
+    }
+
+    return render(request, "photos/photo-add-page.html", context)
 
 
 def details_page(request, pk):
@@ -25,4 +37,24 @@ def details_page(request, pk):
 
 def edit_page(request, pk):
 
-    return render(request, "photos/photo-edit-page.html")
+    photo = Photo.objects.get(id=pk)
+
+    form = PhotoEditForm(request.POST or None, instance=photo)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            return redirect("ph-details-page", pk=photo.id)
+
+    context = {
+        "form": form,
+        "photo": photo
+    }
+
+    return render(request, "photos/photo-edit-page.html", context)
+
+
+def delete_page(request, pk):
+    photo = Photo.objects.get(id=pk)
+    photo.delete()
+    return redirect("home-page")
