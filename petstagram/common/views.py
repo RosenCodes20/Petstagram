@@ -1,4 +1,7 @@
+
+
 from django.shortcuts import render, redirect, resolve_url
+from django.views.generic import ListView
 from pyperclip import copy
 
 from petstagram.common.forms import CommentForm, SearchBarForm
@@ -7,25 +10,56 @@ from petstagram.pets.models import Pet
 from petstagram.photos.models import Photo
 
 
-def index(request):
+class Index(ListView):
+    model = Photo
+    template_name = "common/home-page.html"
+    paginate_by = 1
+    context_object_name = "photos"
 
-    photos = Photo.objects.all()
-    comment_form = CommentForm()
-    comments = Comment.objects.all()
-    search_bar_form = SearchBarForm(request.GET)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-    if search_bar_form.is_valid():
-        cleaned_pet_name = search_bar_form.cleaned_data["pet_name"]
-        photos = photos.filter(tagged_pets__name__icontains=cleaned_pet_name)
+        context["comment_form"] = CommentForm
 
-    context = {
-        "photos": photos,
-        "comment_form": comment_form,
-        "comments": comments,
-        "search_form": search_bar_form
-    }
+        context["search_bar_form"] = SearchBarForm(self.request.GET)
 
-    return render(request, "common/home-page.html", context)
+        context["comments"] = Comment.objects.all()
+
+        return context
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        pet_name = self.request.GET.get("pet_name")
+
+        if pet_name:
+            queryset = queryset.filter(
+                tagged_pets__name__icontains=pet_name
+            )
+
+        return queryset
+
+
+# def index(request):
+#
+#     photos = Photo.objects.all()
+#     comment_form = CommentForm()
+#     comments = Comment.objects.all()
+#     search_bar_form = SearchBarForm(request.GET)
+#
+#     if search_bar_form.is_valid():
+#         cleaned_pet_name = request.GET.get("pet_name")
+#
+#         if cleaned_pet_name:
+#             photos = photos.filter(tagged_pets__name__icontains=cleaned_pet_name)
+#
+#     context = {
+#         "photos": photos,
+#         "comment_form": comment_form,
+#         "comments": comments,
+#         "search_form": search_bar_form
+#     }
+#
+#     return render(request, "common/home-page.html", context)
 
 
 def like_functionality(request, pk):
