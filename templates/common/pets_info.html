@@ -30,7 +30,7 @@
                 {% if photo.location %}
                     <span>{{ photo.location }}</span>
                 {% endif %}
-                {% if photo_page %}
+                {% if photo_page and request.user.pk == photo.user.pk %}
                     <div class="edit-delete-btns">
 
                         <!-- Link to Edit Pet Photo Page -->
@@ -65,7 +65,7 @@
                 <span class="heart">
                                 <a href="{% url 'like' photo.pk %}">
                                     <!-- if user has liked the photo -->
-                                    {% if photo.like_set.all %}
+                                    {% if photo.has_liked %}
                                         <i class="fa-solid fa-heart" style="color: #ed4040;"></i>
                                         <!-- else -->
                                     {% else %}
@@ -86,7 +86,7 @@
         <!-- End Like and Share Buttons -->
 
         <!-- Number of Likes per Photo -->
-        <p class="likes">{{ photo.like_set.count }} likes</p>
+        <p class="likes"> {{ photo.like_set.count }} likes</p>
 
 
         <!-- Start Tagged Pets -->
@@ -122,14 +122,18 @@
                             <div class="profile_img">
                                 <div class="image">
                                     <!-- User Profile Image -->
-                                    <img src="{% static 'images/person.png' %}" alt="img8">
+                                    {% if comment.user.profile.profile_picture %}
+                                        <img src="{{ comment.user.profile.profile_picture }}">
+                                    {% else %}
+                                        <img src="{% static 'images/person.png' %}" alt="img8">
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
                         <p>
                             <!-- Link to User Profile Details Page-->
                             <!-- User First and/or Last Name or username-->
-                            <a href="{% url "profile-details" photo.user.pk %}">{{ photo.user.profile.get_username }}</a>
+                            <a href="{% url "profile-details" comment.user.pk %}">{{ comment.user.profile.get_username }}</a>
                             <!-- User Comment -->
                             {{ comment.comment_text }}
                         </p>
