@@ -1,5 +1,8 @@
 {% extends "base.html" %}
+{% load placeholder_filter %}
 {% block content %}
+   
+
 <!-- End Header Section with Navigation Bar -->
 
     <!-- Start Register Section -->
@@ -8,15 +11,17 @@
             <h1>Petstagram</h1>
 
             <!-- Start Register Form -->
-            <form action="">
-                <input type="text" placeholder="Username">
-
-                <input type="email" placeholder="Email">
-
-                <input type="password" placeholder="Password">
-
-                <input type="password" placeholder="Repeat Password">
-
+            <form action="{% url 'accounts-register' %}" method="post">
+                {{ form.email|placeholder:"Email" }}
+                {{ form.email.errors }}
+                
+                {{ form.password1|placeholder:"Password" }}
+                {{ form.password1.errors }}
+                
+                {{ form.password2|placeholder:"Confirm Passowrd" }}
+                {{ form.password2.errors }}
+                
+                {% csrf_token %}
                 <!-- Register Button -->
                 <button type="submit">Register</button>
             </form>
@@ -26,7 +31,7 @@
         <div class="second-option">
 
             <!-- Link to Login Page -->
-            <p>Have an account? <a href="#">Log in</a></p>
+            <p>Have an account? <a href="{% url 'accounts-login' %}">Log in</a></p>
         </div>
     </div>
     <!-- End Register Section -->

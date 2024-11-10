@@ -5,20 +5,24 @@
     <div class="top">
         <div class="userDetails">
             <!-- Link to User Profile Page -->
-            <a href="#">
+            <a href="{% url 'profile-details' photo.user.pk %}">
                 <div class="profilepic">
                     <div class="profile_img">
                         <div class="image">
-                            <img src="/static/images/person.png" alt="img8">
+                            {% if photo.user.profile.profile_picture %}
+                                <img src="{{ photo.user.profile.profile_picture }}">
+                            {% else %}
+                                <img src="{% static 'images/person.png' %}" alt="img8">
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </a>
             <h3>
                 <!-- Link to User Profile Page -->
-                <a href="#">
+                <a href="{% url 'profile-details' photo.user.pk %}">
                     <!-- if user has first name and last name -->
-                    Rosen Ivanov
+                    {{ photo.user.profile.get_username }}
                     <!-- else -->
                     <!-- show user username -->
                 </a>
@@ -89,7 +93,7 @@
         <!-- Link to First Tagged Pet Details Page-->
     
         {% for pet in photo.tagged_pets.all %}
-            <a href="{% url 'details-page' 'username' pet.slug %}">
+            <a href="{% url 'details-page' photo.user.profile.get_username|lower pet.slug %}">
                 <p class="message">
                     <b>{{ pet.name }}</b>
                 </p>
@@ -125,7 +129,7 @@
                         <p>
                             <!-- Link to User Profile Details Page-->
                             <!-- User First and/or Last Name or username-->
-                            <a href="">Steven Ivanov</a>
+                            <a href="{% url "profile-details" photo.user.pk %}">{{ photo.user.profile.get_username }}</a>
                             <!-- User Comment -->
                             {{ comment.comment_text }}
                         </p>

@@ -45,7 +45,10 @@
                             <i>Add Photo</i>
                         </a>
                     </li>
+                    {% if not request.user.is_authenticated %}    
+                    
                     <li class="nav-item">
+                        
 
                         <!-- Link to Login Page -->
                         <a href="{% url 'accounts-login' %}">
@@ -59,6 +62,27 @@
                             <i>Register</i>
                         </a>
                     </li>
+                    
+                    {% else %}
+                        <li class="nav-item">
+                        
+
+                        <!-- Link to Login Page -->
+                        <a href="{% url 'profile-details' request.user.pk %}">
+                            <i>Profile</i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+
+                        <!-- Link to Register Page -->
+                         <form method="post" action="{% url 'accounts-logout' %}">
+                             {% csrf_token %}
+                            <button class="button" type="submit"><i>Logout</i></button>
+                        </form>
+                    </li>
+                    
+                    {% endif %}
+                    
                 </ul>
             </div>
         </div>
