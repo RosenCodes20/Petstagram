@@ -1,5 +1,6 @@
 from django.db import models
 
+from petstagram.accounts.models import AppUser
 from petstagram.photos.models import Photo
 
 
@@ -19,6 +20,11 @@ class Comment(models.Model):
         related_name="photos"
     )
 
+    user = models.ForeignKey(
+        to=AppUser,
+        on_delete=models.CASCADE
+    )
+
     class Meta:
         ordering = ["-date_time_of_publication"]
 
@@ -27,4 +33,9 @@ class Like(models.Model):
     to_photo = models.ForeignKey(
         to=Photo,
         on_delete=models.CASCADE,
+    )
+
+    user = models.ForeignKey(
+        to=AppUser,
+        on_delete=models.CASCADE
     )

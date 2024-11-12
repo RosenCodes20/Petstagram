@@ -1,5 +1,4 @@
-
-
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, resolve_url
 from django.views.generic import ListView
 from pyperclip import copy
@@ -13,7 +12,7 @@ from petstagram.photos.models import Photo
 class Index(ListView):
     model = Photo
     template_name = "common/home-page.html"
-    paginate_by = 1
+    paginate_by = 2
     context_object_name = "photos"
 
     def get_context_data(self, **kwargs):
@@ -24,6 +23,9 @@ class Index(ListView):
         context["search_bar_form"] = SearchBarForm(self.request.GET)
 
         context["comments"] = Comment.objects.all()
+
+        for photo in context["photos"]:
+            photo.has_liked = photo.like_set.filter(user=self.request.user).exists() if self.request.user.is_authenticated else False
 
         return context
 
@@ -62,16 +64,18 @@ class Index(ListView):
 #     return render(request, "common/home-page.html", context)
 
 
+@login_required
 def like_functionality(request, pk):
 
     photo = Photo.objects.get(id=pk)
-    liked_obj = Like.objects.filter(to_photo_id=photo.id)
+    liked_obj = Like.objects.filter(to_photo_id=photo.id, user=request.user).first()
+
 
     if liked_obj:
         liked_obj.delete()
 
     else:
-        like = Like(to_photo=photo)
+        like = Like(to_photo_id=photo.id, user=request.user)
         like.save()
 
     return redirect(request.META["HTTP_REFERER"] + f"#{photo.id}")
@@ -83,7 +87,7 @@ def share_functionality(request, pk):
 
     return redirect(request.META["HTTP_REFERER"] + f"#{photo.id}")
 
-
+@login_required
 def comment_functionality(request, pk):
 
     if request.method == "POST":
@@ -94,5 +98,6 @@ def comment_functionality(request, pk):
         if comment_form.is_valid():
             comment = comment_form.save(commit=False)
             comment.photo = photo
+            comment.user = request.user
             comment.save()
             return redirect(request.META.get("HTTP_REFERER") + f"#{photo}")
