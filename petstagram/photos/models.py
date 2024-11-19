@@ -1,6 +1,7 @@
 from django.core.validators import MinLengthValidator
 from django.db import models
 
+from petstagram.accounts.models import AppUser
 from petstagram.pets.models import Pet
 from petstagram.photos.validators import validate_image_size
 
@@ -36,4 +37,9 @@ class Photo(models.Model):
 
     date_of_publication = models.DateField(
         auto_now_add=True
+    )
+
+    user = models.ForeignKey(
+        to=AppUser,
+        on_delete=models.CASCADE
     )
